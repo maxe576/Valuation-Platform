@@ -11,10 +11,10 @@ Legend: ✅ done · 🔨 in progress · ⬜ planned
 | 1 | Core architecture: models, DB schema, repository, **demo-data mode** | ✅ |
 | 2 | DCF port: legacy Excel model → tested Python engine | ✅ |
 | 3 | SEC EDGAR: ticker→CIK, Company Facts, normalization, quarterly/TTM | ✅ |
-| 4 | Remaining engines: comps, justified multiple, SOTP, residual income, reverse DCF, blend | ⬜ |
-| 5 | Segment intelligence: dimensional XBRL, aliases, reconciliation, FMP fallback | ⬜ |
-| 6 | Dashboard (MVP milestone): all research pages | ⬜ |
-| 7 | AI layer: structured package, Ollama/Gemini, JSON validation, approval | ⬜ |
+| 4 | Remaining engines: comps, justified multiple, SOTP, residual income, reverse DCF, blend | ✅ |
+| 5 | Segment intelligence: aliases, reconciliation, FMP fallback, segment history | ✅ |
+| 6 | Dashboard (MVP milestone): all research pages | ✅ |
+| 7 | AI layer: structured package, Ollama/Gemini/offline, JSON validation, approval | ✅ |
 | 8 | Supabase persistence: auth, save runs, audit trail | ⬜ |
 | 9 | Exports + outcome tracking: Excel/CSV, 3/6/12-mo accuracy | ⬜ |
 | 10 | Deployment: Streamlit Cloud + Supabase + Windows docs, secrets hygiene | ⬜ |

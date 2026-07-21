@@ -18,6 +18,40 @@
     "minority_interest": 0.0,
     "shares_outstanding": 435000000.0
   },
+  "target_metrics": {
+    "_note": "Target fundamentals for comps/justified. EBITDA = EBIT + D&A (FY2024).",
+    "revenue": 39000966000.0,
+    "ebitda": 25417000000.0,
+    "ebit": 10417000000.0,
+    "net_income": 8711631000.0,
+    "revenue_growth": 0.16,
+    "ebit_margin": 0.267,
+    "own_ev_ebitda": 18.0
+  },
+  "peers": [
+    {"ticker": "DIS",   "ev_ebitda": 12.0, "ev_revenue": 2.5, "pe": 20.0, "revenue_growth": 0.05, "ebit_margin": 0.15},
+    {"ticker": "WBD",   "ev_ebitda": 7.0,  "ev_revenue": 1.4, "pe": 10.0, "revenue_growth": 0.00, "ebit_margin": 0.10},
+    {"ticker": "CMCSA", "ev_ebitda": 7.0,  "ev_revenue": 2.0, "pe": 11.0, "revenue_growth": 0.03, "ebit_margin": 0.20},
+    {"ticker": "PARA",  "ev_ebitda": 6.0,  "ev_revenue": 0.9, "pe": 8.0,  "revenue_growth": -0.02, "ebit_margin": 0.08},
+    {"ticker": "SPOT",  "ev_ebitda": 25.0, "ev_revenue": 3.5, "pe": 60.0, "revenue_growth": 0.16, "ebit_margin": 0.05},
+    {"ticker": "GOOGL", "ev_ebitda": 15.0, "ev_revenue": 6.0, "pe": 24.0, "revenue_growth": 0.13, "ebit_margin": 0.30},
+    {"ticker": "META",  "ev_ebitda": 14.0, "ev_revenue": 8.0, "pe": 26.0, "revenue_growth": 0.18, "ebit_margin": 0.40},
+    {"ticker": "AMZN",  "ev_ebitda": 16.0, "ev_revenue": 3.2, "pe": 35.0, "revenue_growth": 0.11, "ebit_margin": 0.11}
+  ],
+  "segments": [
+    {"name": "UCAN",  "type": "geographic", "revenue": 17400000000.0, "ebitda_margin": 0.45, "ev_ebitda": 14.0},
+    {"name": "EMEA",  "type": "geographic", "revenue": 12000000000.0, "ebitda_margin": 0.40, "ev_ebitda": 13.0},
+    {"name": "LATAM", "type": "geographic", "revenue": 4800000000.0,  "ebitda_margin": 0.35, "ev_ebitda": 11.0},
+    {"name": "APAC",  "type": "geographic", "revenue": 4800000000.0,  "ebitda_margin": 0.30, "ev_ebitda": 15.0}
+  ],
+  "residual_income": {
+    "_note": "Illustrative — Netflix is not book-value driven; included for demo completeness.",
+    "beginning_book_value": 20600000000.0,
+    "net_income_forecast": [9500000000.0, 10800000000.0, 12000000000.0, 13000000000.0, 14000000000.0],
+    "cost_of_equity": 0.10,
+    "terminal_growth": 0.03,
+    "dividend_payout_ratio": 0.0
+  },
   "facts": [
     {"metric": "revenue", "value": 29697844000, "fiscal_year": 2021},
     {"metric": "operating_income", "value": 6194509000, "fiscal_year": 2021},

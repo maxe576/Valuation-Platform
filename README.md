@@ -10,13 +10,17 @@ range, and keeps a full audit trail of sources and analyst decisions.
 
 ## Status
 
-Built through **Phase 3** (see `ROADMAP.md`):
+Built through **Phase 7** (see `ROADMAP.md`):
 
 - ✅ Phase 0 — repo scaffold, config, logging, Streamlit shell
 - ✅ Phase 1 — domain models, DB schema, repository, demo-data mode
 - ✅ Phase 2 — DCF engine ported from the legacy Excel model + tests
 - ✅ Phase 3 — SEC EDGAR client + statement normalization + quarterly/TTM
-- ⬜ Phase 4+ — remaining valuation engines, dashboard, AI, persistence, exports
+- ✅ Phase 4 — comps, justified multiple, SOTP, residual income, reverse DCF, blend
+- ✅ Phase 5 — segment parsing, aliases/history, reconciliation, FMP fallback
+- ✅ Phase 6 — full multipage dashboard (MVP milestone): 10 research pages
+- ✅ Phase 7 — AI research memo: structured package, Ollama/Gemini/offline, validation, approval
+- ⬜ Phase 8+ — Supabase persistence, exports, outcome tracking, deployment
 
 ## Quick start (Windows, no venv activation needed)
 
