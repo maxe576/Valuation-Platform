@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "valuation-platform",
+      "runtimeExecutable": "C:\\Users\\Wmaxe\\Options Trader\\valuation-platform\\.venv\\Scripts\\python.exe",
+      "runtimeArgs": ["-m", "streamlit", "run", "C:\\Users\\Wmaxe\\Options Trader\\valuation-platform\\app.py", "--server.headless=true", "--server.port=8533"],
+      "port": 8533
+    }
+  ]
+}

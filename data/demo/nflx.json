@@ -1,0 +1,53 @@
+{
+  "_note": "DEMO fixture — approximate, rounded figures for offline development. NOT an official data source. Values in full USD.",
+  "company": {
+    "ticker": "NFLX",
+    "name": "Netflix, Inc.",
+    "cik": "0001065280",
+    "sector": "Communication Services",
+    "industry": "Entertainment",
+    "fiscal_year_end": "12-31",
+    "currency": "USD",
+    "lifecycle": "high_growth_profitable"
+  },
+  "current_price": 900.0,
+  "bridge": {
+    "cash": 7804000000.0,
+    "investments": 0.0,
+    "total_debt": 14543000000.0,
+    "minority_interest": 0.0,
+    "shares_outstanding": 435000000.0
+  },
+  "facts": [
+    {"metric": "revenue", "value": 29697844000, "fiscal_year": 2021},
+    {"metric": "operating_income", "value": 6194509000, "fiscal_year": 2021},
+    {"metric": "income_tax", "value": 723875000, "fiscal_year": 2021},
+    {"metric": "net_income", "value": 5116228000, "fiscal_year": 2021},
+    {"metric": "depreciation_amortization", "value": 12000000000, "fiscal_year": 2021},
+    {"metric": "capex", "value": 17000000000, "fiscal_year": 2021},
+
+    {"metric": "revenue", "value": 31615550000, "fiscal_year": 2022},
+    {"metric": "operating_income", "value": 5632831000, "fiscal_year": 2022},
+    {"metric": "income_tax", "value": 772005000, "fiscal_year": 2022},
+    {"metric": "net_income", "value": 4491924000, "fiscal_year": 2022},
+    {"metric": "depreciation_amortization", "value": 14000000000, "fiscal_year": 2022},
+    {"metric": "capex", "value": 14000000000, "fiscal_year": 2022},
+
+    {"metric": "revenue", "value": 33723297000, "fiscal_year": 2023},
+    {"metric": "operating_income", "value": 6954930000, "fiscal_year": 2023},
+    {"metric": "income_tax", "value": 797415000, "fiscal_year": 2023},
+    {"metric": "net_income", "value": 5407990000, "fiscal_year": 2023},
+    {"metric": "depreciation_amortization", "value": 14200000000, "fiscal_year": 2023},
+    {"metric": "capex", "value": 13140000000, "fiscal_year": 2023},
+
+    {"metric": "revenue", "value": 39000966000, "fiscal_year": 2024},
+    {"metric": "operating_income", "value": 10417000000, "fiscal_year": 2024},
+    {"metric": "income_tax", "value": 1254000000, "fiscal_year": 2024},
+    {"metric": "net_income", "value": 8711631000, "fiscal_year": 2024},
+    {"metric": "depreciation_amortization", "value": 15000000000, "fiscal_year": 2024},
+    {"metric": "capex", "value": 16200000000, "fiscal_year": 2024},
+    {"metric": "cash", "value": 7804000000, "fiscal_year": 2024},
+    {"metric": "long_term_debt", "value": 14543000000, "fiscal_year": 2024},
+    {"metric": "shares_diluted", "value": 435000000, "fiscal_year": 2024}
+  ]
+}
