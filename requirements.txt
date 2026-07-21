@@ -8,12 +8,11 @@ requests>=2.32          # SEC EDGAR, FMP, FRED HTTP
 # fredapi is optional; we use requests directly to stay dependency-light
 
 # --- Modeling ---
-scipy>=1.13             # reverse-DCF solver, regression helpers
-statsmodels>=0.14       # justified-multiple OLS (Phase 4)
+scipy>=1.13             # reverse-DCF solver
+# (justified-multiple regression uses numpy.linalg.lstsq — no statsmodels needed)
 
-# --- Persistence (Phase 8; safe to install now) ---
-# supabase>=2.4         # enabled in Phase 8
-SQLAlchemy>=2.0         # local repository backend
+# --- Persistence ---
+supabase>=2.4           # cloud persistence (Phase 8); local uses stdlib sqlite3
 
 # --- Exports (Phase 9) ---
 openpyxl>=3.1           # Excel export + reading legacy DCF workbook
