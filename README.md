@@ -10,7 +10,7 @@ range, and keeps a full audit trail of sources and analyst decisions.
 
 ## Status
 
-Built through **Phase 7** (see `ROADMAP.md`):
+**All 10 phases complete** (see `ROADMAP.md`) — deploy steps in `DEPLOYMENT.md`.
 
 - ✅ Phase 0 — repo scaffold, config, logging, Streamlit shell
 - ✅ Phase 1 — domain models, DB schema, repository, demo-data mode
@@ -20,7 +20,9 @@ Built through **Phase 7** (see `ROADMAP.md`):
 - ✅ Phase 5 — segment parsing, aliases/history, reconciliation, FMP fallback
 - ✅ Phase 6 — full multipage dashboard (MVP milestone): 10 research pages
 - ✅ Phase 7 — AI research memo: structured package, Ollama/Gemini/offline, validation, approval
-- ⬜ Phase 8+ — Supabase persistence, exports, outcome tracking, deployment
+- ✅ Phase 8 — persistence: durable local SQLite + Supabase (cloud) repositories, auth
+- ✅ Phase 9 — Excel/CSV/memo exports + 3/6/12-month outcome tracking & accuracy analytics
+- ✅ Phase 10 — deployment: Streamlit Cloud + Supabase, secrets bootstrap, Windows docs
 
 ## Quick start (Windows, no venv activation needed)
 

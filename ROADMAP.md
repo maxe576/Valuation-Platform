@@ -15,9 +15,11 @@ Legend: ✅ done · 🔨 in progress · ⬜ planned
 | 5 | Segment intelligence: aliases, reconciliation, FMP fallback, segment history | ✅ |
 | 6 | Dashboard (MVP milestone): all research pages | ✅ |
 | 7 | AI layer: structured package, Ollama/Gemini/offline, JSON validation, approval | ✅ |
-| 8 | Supabase persistence: auth, save runs, audit trail | ⬜ |
-| 9 | Exports + outcome tracking: Excel/CSV, 3/6/12-mo accuracy | ⬜ |
-| 10 | Deployment: Streamlit Cloud + Supabase + Windows docs, secrets hygiene | ⬜ |
+| 8 | Persistence: SQLite (local) + Supabase (cloud) repositories, auth, append-only runs | ✅ |
+| 9 | Exports + outcome tracking: Excel/CSV/memo, 3/6/12-mo accuracy | ✅ |
+| 10 | Deployment: Streamlit Cloud + Supabase + Windows docs, secrets bootstrap & hygiene | ✅ |
+
+**All 10 phases complete.** See `DEPLOYMENT.md` for running locally, with Supabase, or on Streamlit Cloud.
 
 ## Legacy DCF: what was ported, what was fixed
 

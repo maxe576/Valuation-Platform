@@ -57,3 +57,17 @@ class ValuationRun:
         if self.blended_value is None or not self.current_price:
             return None
         return self.blended_value / self.current_price - 1.0
+
+
+@dataclass
+class ValuationOutcome:
+    """Realized outcome of a valuation run at a horizon (§25 valuation_outcomes)."""
+
+    valuation_run_id: Optional[int]
+    horizon: str                     # "3m" | "6m" | "12m"
+    observed_date: str               # ISO date
+    observed_price: float
+    total_return: float              # price change vs. price at valuation time
+    forecast_error: float            # (blended fair value − observed) / observed
+    notes: Optional[str] = None
+    id: Optional[int] = None

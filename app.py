@@ -6,6 +6,7 @@ Business logic never lives here — this file only wires navigation and state.
 """
 from __future__ import annotations
 
+import bootstrap  # noqa: F401  — must precede config imports (loads st.secrets → env)
 import streamlit as st
 
 from config.settings import SETTINGS
@@ -45,7 +46,7 @@ def _sidebar() -> None:
             if st.form_submit_button("Load", type="primary"):
                 set_ticker(entered)
         st.divider()
-        st.caption("Built through Phase 7 · research & paper-valuation only.")
+        st.caption("All 10 phases complete · research & paper-valuation only.")
 
 
 def _page(func, title, icon, path):

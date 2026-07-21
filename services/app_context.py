@@ -37,7 +37,27 @@ class ActiveCompany:
 
 @st.cache_resource
 def get_repo() -> Repository:
-    return build_demo_repository() if SETTINGS.is_demo else InMemoryRepository()
+    """Pick the persistence backend.
+
+    demo → in-memory demo repo (fixture preloaded); live + Supabase configured →
+    Supabase; live otherwise → durable local SQLite. Any backend failure degrades
+    to SQLite so the app keeps working.
+    """
+    if SETTINGS.is_demo:
+        return build_demo_repository()
+    if SETTINGS.supabase_enabled:
+        try:
+            from services.supabase_repository import SupabaseRepository
+
+            return SupabaseRepository()
+        except Exception as exc:  # noqa: BLE001
+            st.warning(f"Supabase unavailable ({exc}); using local SQLite storage.")
+    try:
+        from services.sqlite_repository import SQLiteRepository
+
+        return SQLiteRepository()
+    except Exception:  # noqa: BLE001
+        return InMemoryRepository()
 
 
 def active_ticker() -> str:
