@@ -56,8 +56,14 @@ class SupabaseRepository(Repository):
             "fiscal_year_end": company.fiscal_year_end, "currency": company.currency,
             "lifecycle": company.lifecycle.value,
         }
-        res = (self.client.table("companies")
-               .upsert(payload, on_conflict="ticker").execute())
+        # Insert-if-new (avoids upsert, which would need UPDATE permission the
+        # append-only policies don't grant). Companies rarely change; a refresh
+        # of an existing company is a no-op here.
+        existing = self._company_id(company.ticker)
+        if existing is not None:
+            company.id = existing
+            return company
+        res = self.client.table("companies").insert(payload).execute()
         if res.data:
             company.id = res.data[0]["id"]
         return company
@@ -78,15 +84,18 @@ class SupabaseRepository(Repository):
         cid = self._company_id(ticker)
         if cid is None:
             return
+        # Insert only accession numbers we don't already have (no upsert).
+        existing = (self.client.table("filings").select("accession_number")
+                    .eq("company_id", cid).execute())
+        have = {r["accession_number"] for r in (existing.data or [])}
         rows = [{
             "company_id": cid, "accession_number": f.accession_number,
             "form_type": f.form_type.value, "filing_date": f.filing_date or None,
             "report_date": f.report_date, "primary_document": f.primary_document,
             "source_url": f.source_url, "processing_status": f.processing_status,
-        } for f in filings]
+        } for f in filings if f.accession_number not in have]
         if rows:
-            self.client.table("filings").upsert(
-                rows, on_conflict="company_id,accession_number").execute()
+            self.client.table("filings").insert(rows).execute()
 
     def get_filings(self, ticker: str) -> list[Filing]:
         cid = self._company_id(ticker)
@@ -99,6 +108,11 @@ class SupabaseRepository(Repository):
     def save_facts(self, ticker: str, facts: list[FinancialFact]) -> None:
         cid = self._company_id(ticker)
         if cid is None:
+            return
+        # Skip if this company's facts are already stored (avoid duplicates).
+        existing = (self.client.table("financial_facts").select("id")
+                    .eq("company_id", cid).limit(1).execute())
+        if existing.data:
             return
         rows = [{
             "company_id": cid, "metric": f.metric, "reported_label": f.reported_label,
