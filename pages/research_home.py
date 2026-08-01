@@ -39,7 +39,11 @@ def render() -> None:
 
     fv = get_valuation()
     if fv is None:
-        st.info("Add a forecast in the **Forecast Builder** to generate a valuation.")
+        if aset is not None and not price:
+            st.info("Enter the current share price in the sidebar (or let it "
+                    "auto-fetch) to generate a valuation.")
+        else:
+            st.info("Add a forecast in the **Forecast Builder** to generate a valuation.")
         return
 
     st.divider()

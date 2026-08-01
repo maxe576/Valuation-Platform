@@ -112,7 +112,16 @@ def save_working_assumptions(ticker: str, aset: AssumptionSet) -> None:
 def _price_for(ticker: str, facts: list) -> Optional[float]:
     if SETTINGS.is_demo and ticker == DEMO_TICKER:
         return demo_current_price()
-    return st.session_state.get("price_override", {}).get(ticker)
+    # A positive manual override wins; otherwise auto-fetch once per session.
+    override = st.session_state.get("price_override", {}).get(ticker)
+    if override and override > 0:
+        return override
+    fetched = st.session_state.setdefault("price_fetched", {})
+    if ticker not in fetched:
+        from services.price import fetch_price
+
+        fetched[ticker] = fetch_price(ticker)
+    return fetched[ticker]
 
 
 def get_valuation() -> Optional[FullValuation]:

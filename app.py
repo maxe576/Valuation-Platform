@@ -45,6 +45,21 @@ def _sidebar() -> None:
             entered = st.text_input("Ticker", value=active_ticker())
             if st.form_submit_button("Load", type="primary"):
                 set_ticker(entered)
+
+        # Live tickers have no price from SEC; auto-fetched, but overridable.
+        if not SETTINGS.is_demo:
+            t = active_ticker()
+            current = float(st.session_state.get("price_override", {}).get(t, 0.0) or 0.0)
+            price = st.number_input(
+                "Current share price", min_value=0.0, value=current, step=1.0,
+                help="Leave at 0 to auto-fetch the latest close. Enter a value to override.",
+            )
+            st.session_state.setdefault("price_override", {})[t] = price
+            if price <= 0:
+                fetched = st.session_state.get("price_fetched", {}).get(t)
+                st.caption(f"Auto price: ${fetched:,.2f}" if fetched
+                           else "Auto price unavailable — enter it above.")
+
         st.divider()
         st.caption("All 10 phases complete · research & paper-valuation only.")
 

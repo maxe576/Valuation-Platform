@@ -15,8 +15,12 @@ def render() -> None:
     st.header("Valuation Lab")
     active = load_active()
     fv = get_valuation()
-    if fv is None or active is None:
-        st.info("Build a forecast to run valuations.")
+    if fv is None:
+        if active is not None and active.assumption_set is not None and not active.price:
+            st.info("Enter the current share price in the sidebar (or let it "
+                    "auto-fetch) so the valuation has something to compare against.")
+        else:
+            st.info("Load a company and build a forecast to run valuations.")
         return
 
     st.subheader("Blended fair value")
