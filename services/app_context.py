@@ -60,6 +60,19 @@ def get_repo() -> Repository:
         return InMemoryRepository()
 
 
+def get_strategy():
+    """The active investment strategy (editable in the Strategy page)."""
+    import copy
+
+    from models.strategy import DEFAULT_STRATEGY
+
+    return st.session_state.setdefault("strategy", copy.deepcopy(DEFAULT_STRATEGY))
+
+
+def set_strategy(strategy) -> None:
+    st.session_state["strategy"] = strategy
+
+
 def active_ticker() -> str:
     return st.session_state.get("ticker", DEMO_TICKER if SETTINGS.is_demo else "AAPL")
 

@@ -18,8 +18,10 @@ from pages import (
     peer_intelligence,
     quarterly_analysis,
     research_home,
+    screener,
     segment_studio,
     settings as settings_page,
+    strategy_config,
     valuation_history,
     valuation_lab,
 )
@@ -69,6 +71,10 @@ def _page(func, title, icon, path):
 
 
 NAV = {
+    "Screen": [
+        _page(screener.render, "Screener", "🔎", "screener"),
+        _page(strategy_config.render, "Strategy", "🎯", "strategy-config"),
+    ],
     "Research": [
         _page(research_home.render, "Research Home", "🏠", "home"),
         _page(quarterly_analysis.render, "Quarterly Analysis", "📈", "quarterly"),
