@@ -35,7 +35,11 @@ def load_company(
 
     cached = repo.get_company(ticker)
     if cached is not None:
-        return cached, repo.get_facts(ticker)
+        cached_facts = repo.get_facts(ticker)
+        if cached_facts:
+            return cached, cached_facts
+        # Company cached but its facts weren't persisted (e.g. a large insert
+        # failed) — fall through and re-fetch the facts from SEC.
 
     if SETTINGS.is_demo:
         raise CompanyLoadError(
@@ -54,9 +58,14 @@ def load_company(
     company = _company_from_submissions(ticker, cik, submissions)
     facts = normalize_company_facts(facts_json)
 
-    repo.save_company(company)
-    repo.save_facts(ticker, facts)
-    repo.save_filings(ticker, client.get_recent_filings(cik))
+    # Persist as a best-effort cache — a save failure (e.g. a large fact insert
+    # to Supabase) must never break the load. The caller always gets the data.
+    try:
+        repo.save_company(company)
+        repo.save_facts(ticker, facts)
+        repo.save_filings(ticker, client.get_recent_filings(cik))
+    except Exception as exc:  # noqa: BLE001
+        log.warning("Caching %s to the repository failed (non-fatal): %s", ticker, exc)
     log.info("Loaded %s from SEC: %d facts", ticker, len(facts))
     return company, facts
 

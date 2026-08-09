@@ -87,22 +87,34 @@ def active_ticker() -> str:
 
 def set_ticker(ticker: str) -> None:
     ticker = ticker.upper().strip()
-    if ticker != st.session_state.get("ticker"):
-        st.session_state["ticker"] = ticker
-        # Invalidate any cached valuation for the previous ticker.
-        st.session_state.pop("valuation", None)
-        st.session_state.pop("assumptions", None)
+    if not ticker:
+        return
+    st.session_state["ticker"] = ticker
+    # Force a fresh load of this ticker and drop any stale computed valuation.
+    st.session_state.pop("valuation", None)
+    st.session_state.get("loaded", {}).pop(ticker, None)
+    st.session_state.get("price_fetched", {}).pop(ticker, None)
 
 
 def load_active() -> Optional[ActiveCompany]:
-    """Load the active company + facts, seeding a working assumption set."""
+    """Load the active company + facts, seeding a working assumption set.
+
+    The (company, facts) pair is cached in the session per ticker, so moving
+    between pages (Research → Forecast → Valuation) never re-fetches or depends
+    on a database round-trip for the facts.
+    """
     ticker = active_ticker()
     repo = get_repo()
-    try:
-        company, facts = load_company(ticker, repo)
-    except CompanyLoadError as exc:
-        st.error(str(exc))
-        return None
+
+    loaded = st.session_state.setdefault("loaded", {})
+    if ticker not in loaded:
+        try:
+            with st.spinner(f"Loading {ticker} from SEC…"):
+                loaded[ticker] = load_company(ticker, repo)
+        except CompanyLoadError as exc:
+            st.error(str(exc))
+            return None
+    company, facts = loaded[ticker]
 
     assumptions = _working_assumptions(ticker, repo, facts)
     price = _price_for(ticker, facts)
