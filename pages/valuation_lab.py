@@ -1,5 +1,8 @@
-"""Valuation Lab — all methods, weighting, sensitivity, reverse DCF (§14–22, §26)."""
+"""Valuation Lab — a per-method workbench: DCF drivers, comps, weighting (§14–22)."""
 from __future__ import annotations
+
+import copy
+from dataclasses import replace
 
 import pandas as pd
 import streamlit as st
@@ -9,6 +12,7 @@ from components.valuation_chart import valuation_range_chart
 from models.common import Scenario
 from processing.statements import latest_annual
 from valuation import sensitivity as sens
+from valuation.dcf import TerminalMethod, run_dcf
 from valuation.wacc import build_wacc_for_company
 from services.app_context import (
     active_ticker,
@@ -16,6 +20,15 @@ from services.app_context import (
     load_active,
     save_working_assumptions,
 )
+
+_DRIVERS = [
+    ("revenue_growth", "Revenue growth %"),
+    ("ebit_margin", "EBIT margin %"),
+    ("tax_rate", "Tax rate %"),
+    ("da_pct_sales", "D&A % of sales"),
+    ("capex_pct_sales", "CapEx % of sales"),
+    ("nwc_pct_sales", "ΔNWC % of sales"),
+]
 
 
 def render() -> None:
@@ -30,20 +43,101 @@ def render() -> None:
             st.info("Load a company and build a forecast to run valuations.")
         return
 
-    st.subheader("Blended fair value")
+    # Persistent header: the blended fair value up top, always visible.
     valuation_range_chart(fv.bear, fv.base, fv.bull, fv.blended_value, fv.current_price)
     cols = st.columns(4)
-    cols[0].metric("Blended", fmt_money(fv.blended_value))
+    cols[0].metric("Blended fair value", fmt_money(fv.blended_value))
     cols[1].metric("Upside", fmt_pct(fv.upside) if fv.upside is not None else "—")
-    cols[2].metric("Dispersion", fmt_pct(fv.blend.dispersion))
+    cols[2].metric("Method spread", fmt_pct(fv.blend.dispersion))
     cols[3].metric("Confidence", f"{fv.confidence_score:.0f}/100")
 
-    _method_table(fv)
-    _weight_editor(fv)
-    _auto_wacc(active)
-    _dcf_detail(fv)
-    _sensitivity(active)
-    _reverse(fv)
+    tab_blend, tab_dcf, tab_comps, tab_diag = st.tabs(
+        ["Blend & weights", "DCF workbench", "Comparables", "Diagnostics"])
+    with tab_blend:
+        _method_table(fv)
+        _weight_editor(fv)
+    with tab_dcf:
+        _auto_wacc(active)
+        _dcf_workbench(active)
+        _sensitivity(active)
+    with tab_comps:
+        _comps_view(fv)
+    with tab_diag:
+        _dcf_detail(fv)
+        _reverse(fv)
+
+
+def _dcf_workbench(active) -> None:
+    """Edit the base-case DCF drivers by year and see the full FCF build live."""
+    if active is None or active.assumption_set is None:
+        st.info("Load a company with a forecast to edit the DCF.")
+        return
+    aset = active.assumption_set
+    base = aset.scenarios.get(Scenario.BASE)
+    if base is None:
+        return
+
+    st.subheader("Edit DCF drivers by year")
+    st.caption("Percentages below. Revenue → EBIT (margin) → less tax = NOPAT; "
+               "plus D&A, less CapEx and ΔNWC = unlevered free cash flow.")
+    n = base.years()
+    cols = [f"Y{i+1}" for i in range(n)]
+    data = {label: [round(getattr(base, key)[i] * 100, 1) for i in range(n)]
+            for key, label in _DRIVERS}
+    df = pd.DataFrame(data, index=cols).T
+    edited = st.data_editor(df, use_container_width=True, key="dcf_wb")
+
+    def col(label):
+        return [float(x) / 100.0 for x in edited.loc[label].tolist()]
+
+    sa = replace(base, **{key: col(label) for key, label in _DRIVERS})
+    res = run_dcf(
+        base_year_revenue=aset.base_year_revenue, scenario_assumptions=sa,
+        wacc=aset.wacc, terminal_growth=aset.terminal_growth,
+        exit_multiple=aset.exit_multiple, cash=aset.cash, investments=aset.investments,
+        total_debt=aset.total_debt, minority_interest=aset.minority_interest,
+        shares_outstanding=aset.shares_outstanding,
+        terminal_method=TerminalMethod.PERPETUAL_GROWTH, current_price=active.price,
+    )
+
+    build = [{
+        "Year": y.year_index, "Revenue": fmt_money(y.revenue), "EBIT": fmt_money(y.ebit),
+        "NOPAT": fmt_money(y.ebiat), "D&A": fmt_money(y.da), "CapEx": fmt_money(y.capex),
+        "ΔNWC": fmt_money(y.nwc_change), "Unlevered FCF": fmt_money(y.unlevered_fcf),
+        "PV of FCF": fmt_money(y.pv_unlevered_fcf),
+    } for y in res.years]
+    st.dataframe(pd.DataFrame(build), use_container_width=True, hide_index=True)
+
+    b = st.columns(4)
+    b[0].metric("Enterprise value", fmt_money(res.enterprise_value))
+    b[1].metric("Equity value", fmt_money(res.equity_value))
+    b[2].metric("Value / share", fmt_money(res.per_share_value))
+    b[3].metric("Upside", fmt_pct(res.upside) if res.upside is not None else "—")
+    st.caption(f"WACC {aset.wacc:.1%} · terminal growth {aset.terminal_growth:.1%} · "
+               f"terminal = {res.tv_pct_of_ev:.0%} of EV. Edit WACC/terminal in the "
+               "Forecast Builder; set WACC via Auto-WACC above.")
+    for w in res.warnings:
+        st.warning(w)
+    if st.button("💾 Save these drivers to the base case"):
+        new = copy.deepcopy(aset)
+        new.scenarios[Scenario.BASE] = sa
+        save_working_assumptions(active_ticker(), new)
+        st.success("Base-case drivers saved. The blended valuation will update.")
+
+
+def _comps_view(fv) -> None:
+    if not fv.comps:
+        st.info("No peer multiples configured for this company. "
+                "Peer comparison lives on the Peer Intelligence page.")
+        return
+    for metric, res in fv.comps.items():
+        st.markdown(f"**{metric.replace('_', '/').upper()}**")
+        c = st.columns(4)
+        c[0].metric("Median", fmt_x(res.stats.median))
+        c[1].metric("25th–75th", f"{res.stats.p25:.1f}–{res.stats.p75:.1f}x")
+        c[2].metric("Implied $/sh", fmt_money(res.per_share_at_median))
+        c[3].metric("Peers", str(res.stats.n))
+    st.caption("Full peer table and premium/discount on the Peer Intelligence page.")
 
 
 def _auto_wacc(active) -> None:
