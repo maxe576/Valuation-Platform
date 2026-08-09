@@ -60,6 +60,14 @@ def get_repo() -> Repository:
         return InMemoryRepository()
 
 
+@st.cache_data(ttl=43200, show_spinner="Building the screener universe from SEC data…")
+def screener_universe() -> list:
+    """The scored universe source, cached 12h (SEC build is fetched once)."""
+    from screener.universe import get_screener_universe
+
+    return get_screener_universe()
+
+
 def get_strategy():
     """The active investment strategy (editable in the Strategy page)."""
     import copy

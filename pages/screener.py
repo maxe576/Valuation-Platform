@@ -5,18 +5,19 @@ import pandas as pd
 import streamlit as st
 
 from components.metric_cards import fmt_money, metric_row
+from config.settings import SETTINGS
 from screener.scoring import score_universe
-from screener.universe import get_screener_universe
-from services.app_context import get_strategy
+from services.app_context import get_strategy, screener_universe
 
 
 def render() -> None:
     st.header("Screener")
     strategy = get_strategy()
-    st.caption(f"Scored against **{strategy.name}** · {len(strategy.criteria)} criteria. "
-               "Edit the criteria in the Strategy page.")
+    source = "live SEC data" if not SETTINGS.is_demo else "demo seed list"
+    st.caption(f"Scored against **{strategy.name}** · {len(strategy.criteria)} criteria "
+               f"· universe from **{source}**. Edit criteria in the Strategy page.")
 
-    universe = get_screener_universe()
+    universe = screener_universe()
     scored = score_universe(universe, strategy)
     by_ticker = {s.ticker: s for s in scored}
     meta = {row["ticker"]: row for row in universe}
@@ -44,7 +45,7 @@ def render() -> None:
         rows.append({
             "Ticker": s.ticker,
             "Company": m.get("name", ""),
-            "Mkt cap": fmt_money((m.get("market_cap") or 0) * 1e9),
+            "Mkt cap": fmt_money(m["market_cap"] * 1e9) if m.get("market_cap") else "—",
             "Rev gr.": _pct(m.get("revenue_growth")),
             "EBIT %": _pct(m.get("ebit_margin")),
             "EPS gr.": _pct(m.get("eps_growth")),

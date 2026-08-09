@@ -7,8 +7,7 @@ import pandas as pd
 import streamlit as st
 
 from screener.scoring import score_company
-from screener.universe import get_screener_universe
-from services.app_context import get_strategy
+from services.app_context import get_strategy, screener_universe
 
 _EXAMPLE = [
     ("META", 14), ("MSFT", 13), ("NVDA", 12), ("GOOGL", 11), ("NOW", 9),
@@ -26,7 +25,7 @@ def render() -> None:
     if not holdings:
         return
 
-    meta = {row["ticker"]: row for row in get_screener_universe()}
+    meta = {row["ticker"]: row for row in screener_universe()}
     st.session_state["portfolio_tickers"] = [t for t, _ in holdings]
 
     rows, weighted_fit, total_w, passing_w = [], 0.0, 0.0, 0.0

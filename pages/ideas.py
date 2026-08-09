@@ -5,8 +5,7 @@ import streamlit as st
 
 from components.metric_cards import fmt_pct
 from screener.scoring import score_universe
-from screener.universe import get_screener_universe
-from services.app_context import get_strategy, set_ticker
+from services.app_context import get_strategy, screener_universe, set_ticker
 
 
 def render() -> None:
@@ -16,7 +15,7 @@ def render() -> None:
     st.caption(f"Stocks that clear **{strategy.name}** and aren't in your portfolio. "
                "A research starting point, not a buy list.")
 
-    universe = get_screener_universe()
+    universe = screener_universe()
     meta = {row["ticker"]: row for row in universe}
     scored = score_universe(universe, strategy)
 
