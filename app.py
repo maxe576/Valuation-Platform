@@ -15,7 +15,9 @@ from pages import (
     ai_memo,
     financial_statements,
     forecast_builder,
+    ideas,
     peer_intelligence,
+    portfolio_fit,
     quarterly_analysis,
     research_home,
     screener,
@@ -73,6 +75,8 @@ def _page(func, title, icon, path):
 NAV = {
     "Screen": [
         _page(screener.render, "Screener", "🔎", "screener"),
+        _page(portfolio_fit.render, "Portfolio Fit", "📁", "portfolio-fit"),
+        _page(ideas.render, "Ideas", "💡", "ideas"),
         _page(strategy_config.render, "Strategy", "🎯", "strategy-config"),
     ],
     "Research": [
