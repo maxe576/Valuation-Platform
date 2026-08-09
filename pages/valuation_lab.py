@@ -7,8 +7,15 @@ import streamlit as st
 from components.metric_cards import fmt_money, fmt_pct, fmt_x
 from components.valuation_chart import valuation_range_chart
 from models.common import Scenario
+from processing.statements import latest_annual
 from valuation import sensitivity as sens
-from services.app_context import get_valuation, load_active
+from valuation.wacc import build_wacc_for_company
+from services.app_context import (
+    active_ticker,
+    get_valuation,
+    load_active,
+    save_working_assumptions,
+)
 
 
 def render() -> None:
@@ -33,9 +40,45 @@ def render() -> None:
 
     _method_table(fv)
     _weight_editor(fv)
+    _auto_wacc(active)
     _dcf_detail(fv)
     _sensitivity(active)
     _reverse(fv)
+
+
+def _auto_wacc(active) -> None:
+    """Auto-calculate WACC (CAPM, like the Excel) and offer to apply it."""
+    if active is None or active.assumption_set is None:
+        return
+    aset = active.assumption_set
+    with st.expander("⚙️ Auto-WACC (calculated for you)"):
+        shares = aset.shares_outstanding
+        equity = (active.price * shares) if (active.price and shares) else 0.0
+
+        # Tax rate from filings: income tax / operating income, else default.
+        tax = latest_annual(active.facts, "income_tax")
+        ebit = latest_annual(active.facts, "operating_income")
+        tax_rate = None
+        if tax and ebit and ebit > 0:
+            tax_rate = max(0.0, min(0.35, tax / ebit))
+
+        beta = st.number_input("Beta", value=1.0, step=0.05, format="%.2f",
+                               help="Default 1.0. Enter the company's beta if you have it.")
+        result = build_wacc_for_company(
+            equity_value=equity or 1.0, debt_value=aset.total_debt,
+            tax_rate=tax_rate, beta=beta,
+        )
+        rows = [{"Component": k, "Value": v} for k, v in result.breakdown()]
+        st.dataframe(rows, use_container_width=True, hide_index=True)
+        st.caption("Risk-free from FRED when configured (else a recent default); "
+                   "tax rate from filings; equity/debt weights from market cap and debt.")
+        if st.button(f"Apply WACC = {result.wacc*100:.2f}% to the model"):
+            import copy
+            new = copy.deepcopy(aset)
+            new.wacc = round(result.wacc, 4)
+            save_working_assumptions(active_ticker(), new)
+            st.success(f"WACC set to {result.wacc*100:.2f}%. Reopen the page to see "
+                       "the valuation update.")
 
 
 def _method_table(fv) -> None:
