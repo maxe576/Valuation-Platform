@@ -16,6 +16,10 @@ def render() -> None:
     source = "live SEC data" if not SETTINGS.is_demo else "demo seed list"
     st.caption(f"Scored against **{strategy.name}** · {len(strategy.criteria)} criteria "
                f"· universe from **{source}**. Edit criteria in the Strategy page.")
+    if not SETTINGS.is_demo and not SETTINGS.fmp_enabled:
+        st.info("Fundamental metrics are live from SEC. Valuation multiples "
+                "(P/E, P/S, PEG, market cap) show **n/a** until a free FMP API key "
+                "is added — set `FMP_API_KEY` in the app secrets to unlock them.")
 
     universe = screener_universe()
     scored = score_universe(universe, strategy)

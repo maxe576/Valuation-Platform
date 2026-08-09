@@ -21,7 +21,7 @@ def fetch_price(ticker: str, cache: Optional[JsonCache] = None) -> Optional[floa
     """Return the latest close for a US ticker, or None if unavailable."""
     ticker = ticker.upper().strip()
     cache = cache or JsonCache()
-    url = f"https://stooq.com/q/l/?s={ticker}.us&f=sd2t2ohlcv&h&e=csv"
+    url = f"https://stooq.com/q/l/?s={ticker.lower()}.us&f=sd2t2ohlcv&h&e=csv"
 
     cached = cache.get(url, ttl_seconds=_TTL)
     if cached is not None:

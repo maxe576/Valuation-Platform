@@ -103,6 +103,14 @@ def build_live_universe(
     universe = universe[:max_names]
     log.info("Built live universe: %d names (FY%d, revenue ≥ $%.0fM)",
              len(universe), year, min_revenue / 1e6)
+
+    # Fill valuation multiples from prices when FMP is configured (no-op otherwise).
+    try:
+        from screener.price_enrich import enrich_with_prices
+
+        enrich_with_prices(universe)
+    except Exception as exc:  # noqa: BLE001 — prices are optional
+        log.warning("Price enrichment skipped: %s", exc)
     return universe
 
 

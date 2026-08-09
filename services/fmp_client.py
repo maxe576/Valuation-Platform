@@ -68,6 +68,25 @@ class FMPClient:
             return float(data[0]["price"])
         return None
 
+    def get_batch_quotes(self, tickers: list[str]) -> dict[str, dict]:
+        """Batch quotes (price, marketCap, pe, eps, shares) keyed by symbol.
+
+        FMP accepts many comma-separated symbols per request, so the whole
+        screener universe is covered in a few calls. Empty without a key.
+        """
+        if not self.enabled or not tickers:
+            return {}
+        out: dict[str, dict] = {}
+        for i in range(0, len(tickers), 400):
+            syms = ",".join(tickers[i:i + 400])
+            data = self._get(f"{_BASE}/quote/{syms}?apikey={self.api_key}")
+            if isinstance(data, list):
+                for q in data:
+                    sym = q.get("symbol")
+                    if sym:
+                        out[str(sym).upper()] = q
+        return out
+
     def get_profile(self, ticker: str) -> Optional[dict]:
         data = self._get(f"{_BASE}/profile/{ticker.upper()}?apikey={self.api_key}")
         if isinstance(data, list) and data:
