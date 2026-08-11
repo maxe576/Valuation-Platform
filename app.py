@@ -99,6 +99,9 @@ NAV = {
 
 
 def main() -> None:
+    from components.theme import inject
+
+    inject()
     _sidebar()
     nav = st.navigation(NAV)
     nav.run()

@@ -1,10 +1,10 @@
-# Institutional dark theme (see §27). Refined further in Phase 6.
+# Institutional dark theme, matching the "Vantage" mockup.
 [theme]
 base = "dark"
-primaryColor = "#4C8DFF"
-backgroundColor = "#0E1117"
-secondaryBackgroundColor = "#161B22"
-textColor = "#E6EDF3"
+primaryColor = "#46c7b8"
+backgroundColor = "#0d1219"
+secondaryBackgroundColor = "#141c26"
+textColor = "#e7eef6"
 font = "sans serif"
 
 [server]
